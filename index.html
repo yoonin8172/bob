@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>밥 차려주기</title>
+    <link rel="stylesheet" href="./src/style.css" />
+</head>
+
+<body>
+    <main id="app" class="app-shell">
+        <section class="phone-stage" aria-label="밥상 이미지 만들기">
+            <canvas id="stageCanvas" width="1080" height="2360"></canvas>
+
+            <div class="stage-controls" data-html2canvas-ignore="true">
+                <button id="saveButton" class="control-button save-button" type="button" hidden>
+                    저장하기
+                </button>
+
+                <label id="photoPickerLabel" class="control-button photo-button">
+                    <span id="photoButtonText" class="photo-button-text">+</span>
+                    <span id="photoButtonSubtext" class="photo-button-subtext" hidden>(다시하기)</span>
+                    <input id="photoInput" type="file" accept="image/*" />
+                </label>
+
+                <button id="dishButton" class="control-button dish-button" type="button" hidden>
+                    반찬 추가
+                </button>
+            </div>
+        </section>
+
+        <div id="dishModal" class="modal" aria-hidden="true" inert>
+            <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="dishModalTitle">
+                <div class="modal-header">
+                    <h1 id="dishModalTitle">반찬 고르기 <span>(최대 8개)</span></h1>
+                    <button id="closeModalButton" class="icon-button" type="button" aria-label="닫기">x</button>
+                </div>
+
+                <div id="dishList" class="dish-list"></div>
+
+                <div class="modal-actions">
+                    <button id="completeDishButton" class="primary-button" type="button">완료</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script type="module" src="./src/main.js"></script>
+</body>
+
+</html>
