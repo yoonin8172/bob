@@ -389,7 +389,7 @@ function openDishModal() {
 
 function closeDishModal(focusTarget = dishButton) {
     if (dishModal.contains(document.activeElement)) {
-        const target = focusTarget && !focusTarget.hidden ? focusTarget : photoPickerLabel;
+        const target = focusTarget instanceof HTMLElement && !focusTarget.hidden ? focusTarget : photoPickerLabel;
         target.focus({ preventScroll: true });
     }
 
@@ -421,6 +421,9 @@ function createDishList() {
 
         const name = document.createElement("span");
         name.className = "dish-name";
+        if (dish.id === "eggTart") {
+            name.classList.add("dish-name-small");
+        }
         name.textContent = dish.name;
 
         label.append(checkbox, img, name);
@@ -485,7 +488,7 @@ dishButton.addEventListener("click", () => {
     openDishModal();
 });
 
-closeModalButton.addEventListener("click", closeDishModal);
+closeModalButton.addEventListener("click", () => closeDishModal(dishButton));
 completeDishButton.addEventListener("click", completeDishSelection);
 saveButton.addEventListener("click", saveCanvas);
 dishList.addEventListener("change", syncDishSelectionLimit);
