@@ -48,6 +48,8 @@ const dishModal = document.querySelector("#dishModal");
 const dishList = document.querySelector("#dishList");
 const closeModalButton = document.querySelector("#closeModalButton");
 const completeDishButton = document.querySelector("#completeDishButton");
+const SAVE_FILE_NAME = "bab-sang.png";
+const SAVE_BUTTON_TEXT = saveButton.textContent.trim();
 
 const state = {
     userPhoto: null,
@@ -456,11 +458,78 @@ function completeDishSelection() {
     closeDishModal(saveButton);
 }
 
-function saveCanvas() {
+function dataUrlToBlob(dataUrl) {
+    const [metadata, content] = dataUrl.split(",");
+    const mime = metadata.match(/:(.*?);/)?.[1] || "image/png";
+    const binary = atob(content);
+    const bytes = new Uint8Array(binary.length);
+
+    for (let index = 0; index < binary.length; index += 1) {
+        bytes[index] = binary.charCodeAt(index);
+    }
+
+    return new Blob([bytes], { type: mime });
+}
+
+function getCanvasBlob() {
+    return dataUrlToBlob(canvas.toDataURL("image/png"));
+}
+
+function downloadBlob(blob) {
     const link = document.createElement("a");
-    link.download = "bab-sang.png";
-    link.href = canvas.toDataURL("image/png");
+    const url = URL.createObjectURL(blob);
+
+    link.download = SAVE_FILE_NAME;
+    link.href = url;
+    document.body.append(link);
     link.click();
+    link.remove();
+
+    window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+function canShareFile(file) {
+    if (!navigator.share || typeof navigator.canShare !== "function") {
+        return false;
+    }
+
+    return navigator.canShare({ files: [file] });
+}
+
+function isShareCancelled(error) {
+    return error.name === "AbortError";
+}
+
+async function saveCanvas() {
+    saveButton.disabled = true;
+    saveButton.textContent = "저장 중";
+
+    try {
+        const blob = getCanvasBlob();
+        const file = new File([blob], SAVE_FILE_NAME, { type: blob.type });
+
+        if (canShareFile(file)) {
+            await navigator.share({
+                files: [file],
+                title: "밥 차려주기",
+            });
+        } else {
+            downloadBlob(blob);
+        }
+    } catch (error) {
+        if (isShareCancelled(error)) {
+            return;
+        }
+
+        try {
+            downloadBlob(getCanvasBlob());
+        } catch {
+            window.alert("이미지를 저장하지 못했습니다. Safari에서 다시 시도해 주세요.");
+        }
+    } finally {
+        saveButton.disabled = false;
+        saveButton.textContent = SAVE_BUTTON_TEXT;
+    }
 }
 
 photoInput.addEventListener("change", (event) => {
